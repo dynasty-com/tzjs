@@ -18,10 +18,10 @@ npm i tzjs
 const d1 = new Date('2020-01-01') // Jan 1, midnight UTC
 tzjs.getOffset('Europe/Berlin', d1) // -60
 
-const d2 = new Date('2020-06-01') //  June 1, now we're in daylight savings time
+const d2 = new Date('2020-06-01') //  June 1, now we're on daylight savings
 tzjs.getOffset('Europe/Berlin', d2) // -120
 
-tzjs.getOffset('America/Los_Angeles', new Date()) // current west coast offset
+tzjs.getOffset('America/Los_Angeles', new Date()) // current offset in LA/SF
 ```
 
 support all the world's timezones, including DST and historical changes, in under 1KB of javascript!
@@ -30,11 +30,12 @@ support all the world's timezones, including DST and historical changes, in unde
 ### print dates
 
 ```js
-tzjs.fmt({hour: 'numeric', minute: '2-digit', timeZoneName: 'short'}).format(d1)
+const o1 = {hour: 'numeric', minute: '2-digit', timeZoneName: 'short'}
+tzjs.fmt(o1).format(d1)
 // example: "4:00 PM PST". localizes to the user's timezone and language
 
-
-tzjs.fmt({hour: 'numeric', minute: '2-digit', timeZone: 'UTC'}).format(d1, 'en-US')
+const o2 = {hour: 'numeric', minute: '2-digit', timeZone: 'UTC'}
+tzjs.fmt(o2).format(d1, 'en-US')
 // always returns "12:00 AM", regardless of browser settings
 ```
 
@@ -95,14 +96,20 @@ getOffset('America/Los_Angeles', '2020-01-01T00:00:00Z')
 
 returns `Intl.DateTimeFormat(locale, options)`
 
-fmtizes the result. this is important, since the `DateTimeFormat` constructor is slow.
+memoizes the result. this is important, since the `DateTimeFormat` constructor is slow.
 
 `locale` is optional and defaults to the browser locale.
 
 **example:**
 
 ```js
-const opts = {year: 'numeric', month: 'short', day: '2-digit', hour: 'numeric', minute: 'numeric'}
+const opts = {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: 'numeric',
+  minute: 'numeric'
+}
 const optsWithTz = Object.assign({timeZone: 'America/New_York'}, opts)
 
 fmt(optsWithTz, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
@@ -123,13 +130,13 @@ fmt(opts).format(new Date('2020-01-01T00:00:00Z'))
 
 ### `toDate`
 
-helper function. takes a `Date` object, Unix millis, an ISO timestamp like `"2020-01-01T00:00:00Z"`. returns a `Date`.
+helper function. takes a `Date` object, Unix millis, or an ISO timestamp like `"2020-01-01T00:00:00Z"`. returns a `Date`.
 
 **example:**
 
 ```js
-fmt({hour: 'numeric', minute: 'numeric', timeZoneName: 'short'}).format(toDate('2020-01-01'))
-// returns "4:00 PM PST", correctly localized to the user's timezone and language setting
+fmt({year: 'numeric'}).format(toDate('2020-06-01'))
+// returns "2020"
 ```
 
 
@@ -152,12 +159,16 @@ the [Internationalization API](https://developer.mozilla.org/en-US/docs/Web/Java
 you can **print** any instant in any timezone:
 
 ```js
-const options = {hour: '2-digit', timeZoneName: 'short', timeZone: 'Europe/Berlin'}
+const options = {
+  hour: '2-digit',
+  timeZoneName: 'short',
+  timeZone: 'Europe/Berlin'
+}
 const format = window.Intl.DateTimeFormat('en-US', options)
-console.log(format.format(new Date('2020-01-01'))) // Midnight Jan 1 UTC
-// Prints 1 AM GMT+1
-console.log(format.format(new Date('2020-06-01'))) // Midnight June 1 UTC
-// Prints 2 AM GMT+2 (because of DST)
+format.format(new Date('2020-01-01')) // Midnight Jan 1 UTC
+// "1 AM GMT+1"
+format.format(new Date('2020-06-01')) // Midnight June 1 UTC
+// "2 AM GMT+2" (because of DST)
 ```
 
 so under the hood, browser must already have the timezone database, and must already be calculating offsets. however, the offsets are **not exposed in the API**.

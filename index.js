@@ -47,7 +47,7 @@ function getPseudoISO (date, timeZone) {
 
 // Memoizes an Intl.DateTimeFormat.
 //
-// The constructor is expensive, so fmtizing can be important for performance.
+// The constructor is expensive, so memoizing can be important for performance.
 //
 // Returns new Intl.DateTimeFormat(locale, opts)
 function fmt (opts, locale, key) {
