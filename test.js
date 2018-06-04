@@ -1,6 +1,30 @@
 const test = require('tape')
-const { getOffset } = require('.')
+const { getOffset, fmt, toDate } = require('.')
 
+test('toDate', function (t) {
+  const d = new Date('2020-01-01T00:00:00Z')
+  t.equal(toDate(d), d) // check ref equals
+
+  const ms = d.getTime()
+  t.equal(toDate('2020-01-01').getTime(), ms)
+  t.equal(toDate('2020-01-01T00:00:00Z').getTime(), ms)
+  t.equal(toDate(1577836800000).getTime(), ms)
+  t.end()
+})
+
+test('fmt', function (t) {
+  const d1 = new Date('2020-01-01') // Jan 1, midnight UTC
+  t.equal(getOffset('Europe/Berlin', d1), -60)
+
+  const d2 = new Date('2020-06-01') //  June 1, now we're in daylight savings time
+  t.equal(getOffset('Europe/Berlin', d2), -120)
+
+  t.equal(fmt({hour: 'numeric', minute: '2-digit', timeZone: 'UTC'}).format(d1, 'en-US'), '12:00 AM')
+
+  t.end()
+})
+
+// With thanks to https://github.com/mobz/get-timezone-offset !
 var tzinfo = [
   ['UTC', 1483272000000, 0],
 

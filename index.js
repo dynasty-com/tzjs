@@ -1,4 +1,4 @@
-module.exports = { memo, getOffset, toDate }
+module.exports = { getOffset, fmt, toDate }
 
 const _formatters = {}
 
@@ -29,7 +29,7 @@ function getOffset (timeZone, date) {
 // Instead, the returned time is local to the specified timezone.
 function getPseudoISO (date, timeZone) {
   // Africaans "af-ZA" with 2-digit everything roughly returns ISO
-  const str = memo({
+  const str = fmt({
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -47,10 +47,10 @@ function getPseudoISO (date, timeZone) {
 
 // Memoizes an Intl.DateTimeFormat.
 //
-// The constructor is expensive, so memoizing can be important for performance.
+// The constructor is expensive, so fmtizing can be important for performance.
 //
 // Returns new Intl.DateTimeFormat(locale, opts)
-function memo (opts, locale, key) {
+function fmt (opts, locale, key) {
   key = key || ((locale || '') + JSON.stringify(opts))
   if (_formatters[key] == null) {
     _formatters[key] = new Intl.DateTimeFormat(locale, opts)

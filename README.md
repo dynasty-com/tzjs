@@ -7,14 +7,33 @@ timezones without bloat
 
 ## quick start
 
+### get timezone offsets
+
 ```js
-const d1 = new Date('2020-01-01') // 2020 Jan 1, midnight UTC
-console.log(tzjs.getOffset('Europe/Berlin', d1)) // prints -60
-const d2 = new Date('2020-06-01')
-console.log(tzjs.getOffset('Europe/Berlin', d2)) // prints -120
+const d1 = new Date('2020-01-01') // Jan 1, midnight UTC
+tzjs.getOffset('Europe/Berlin', d1) // -60
+
+const d2 = new Date('2020-06-01') //  June 1, now we're in daylight savings time
+tzjs.getOffset('Europe/Berlin', d2) // -120
+
+tzjs.getOffset('America/Los_Angeles', new Date()) // current west coast offset
 ```
 
 support all the world's timezones, including DST and historical changes, in under 1KB of javascript!
+
+
+### print dates
+
+```js
+tzjs.fmt({hour: 'numeric', minute: '2-digit', timeZoneName: 'short'}).format(d1)
+// example: "4:00 PM PST". localizes to the user's timezone and language
+
+
+tzjs.fmt({hour: 'numeric', minute: '2-digit', timeZone: 'UTC'}).format(d1, 'en-US')
+// always returns "12:00 AM", regardless of browser settings
+```
+
+`fmt` is a thin wrapper around `Intl.DateTimeFormat`. it's shorter to type and memoized, which we've measured to be important for performance.
 
 
 ## quick comparison
@@ -28,6 +47,8 @@ if you need to format times in a specific timezone--any timezone other than brow
 | moment | 227KB | moment-timezone | 407KB |
 | date-fns | 29KB | [doesn't exist yet](https://github.com/date-fns/date-fns/issues/489) | - |
 | **window.Intl.DateTimeFormat** | **0KB** | **tzjs** | **1KB** |
+
+**you can use `tzjs` by itself or together with `date-fns`**
 
 
 ## faq
@@ -88,7 +109,7 @@ so the built-in `Intl.DateTimeFormat` is lots lighter than moment. however, writ
 not only that, it can be **slow**. we've seen the `DateTimeFormat` constructor show up in profiles, taking up more than half of our frontend CPU!
 
 
-### solution: `tzjs.memo`
+### solution: `tzjs.fmt`
 
 we've found the following to work well. specifically, it's fast and light.
 
@@ -96,13 +117,13 @@ create a file that can be shared across your frontend. ours is called `date.js`:
 
 ```js
 /* @flow */
-import { memo, toDate } from 'tzjs'
+import { fmt, toDate } from 'tzjs'
 
 /**
  * Returns eg "Sun, Mar 11, 11:55pm PST"
  */
 export function dateTimeTz (d: string | Date, timeZone?: ?string): string {
-  return memo('en-US', {
+  return fmt('en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -118,7 +139,7 @@ export function dateTimeTz (d: string | Date, timeZone?: ?string): string {
  * Returns eg "3/11" for March 11
  */
 export function dateMD(d: string | Date, timeZone?: ?string): string {
-  return memo('en-US', {
+  return fmt('en-US', {
     month: 'numeric',
     day: 'numeric',
     timeZone
@@ -146,15 +167,15 @@ function MessageLabel (date: Date) {
 `tzjs` exports just three functions.
 
 
-```
-const { getOffset, memo, toDate } = require('tzjs')
+```js
+const { getOffset, fmt, toDate } = require('tzjs')
 ```
 
 or, with ES6,
 
 
-```
-import { getOffset, memo, toDate } from 'tzjs'
+```js
+import { getOffset, fmt, toDate } from 'tzjs'
 ```
 
 ### `getOffset(timeZone, date)`
@@ -169,37 +190,37 @@ this behavior matches [Date.getTimezoneOffset](https://developer.mozilla.org/en-
 
 **example:**
 
-```
+```js
 getOffset('America/Los_Angeles', '2020-01-01T00:00:00Z')
 // returns 480
 ```
 
 
-### `memo(options, locale)`
+### `fmt(options, locale)`
 
 returns `Intl.DateTimeFormat(locale, options)`
 
-memoizes the result. this is important, since the `DateTimeFormat` constructor is slow.
+fmtizes the result. this is important, since the `DateTimeFormat` constructor is slow.
 
 `locale` is optional and defaults to the browser locale.
 
 **example:**
 
-```
+```js
 const opts = {year: 'numeric', month: 'short', day: '2-digit', hour: 'numeric', minute: 'numeric'}
 const optsWithTz = Object.assign({timeZone: 'America/New_York'}, opts)
 
-memo(optsWithTz, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
+fmt(optsWithTz, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
 // always returns "Dec 31, 2019, 7:00 PM"
 
-memo(opts, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
+fmt(opts, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
 // returns "Dec 31, 2019, 4:00 PM" here in California
 // return value depends on browser timezone
 
-memo(optsTz, 'es').format(new Date('2020-01-01T00:00:00Z'))
+fmt(optsTz, 'es').format(new Date('2020-01-01T00:00:00Z'))
 // always returns "31 dic. 2019 19:00"
 
-memo(opts).format(new Date('2020-01-01T00:00:00Z'))
+fmt(opts).format(new Date('2020-01-01T00:00:00Z'))
 // might produce any of the values above!
 // return value depends on browser timezone and language setting
 ```
@@ -211,7 +232,7 @@ helper function. takes a `Date` object, Unix millis, an ISO timestamp like `"202
 
 **example:**
 
-```
-memo({hour: 'numeric', minute: 'numeric', timeZoneName: 'short'}).format(toDate('2020-01-01'))
+```js
+fmt({hour: 'numeric', minute: 'numeric', timeZoneName: 'short'}).format(toDate('2020-01-01'))
 // returns "4:00 PM PST", correctly localized to the user's timezone and language setting
 ```
