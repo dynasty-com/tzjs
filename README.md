@@ -6,13 +6,13 @@ timezones without bloat
 
 **use moment-timezone? save 400KB, minified!**
 
+
+
 ## quick start
 
 ```
 npm i tzjs
 ```
-
-### get timezone offsets
 
 ```js
 const d1 = new Date('2020-01-01') // Jan 1, midnight UTC
@@ -22,31 +22,34 @@ const d2 = new Date('2020-06-01') //  June 1, now we're on daylight savings
 tzjs.getOffset('Europe/Berlin', d2) // -120
 
 tzjs.getOffset('America/Los_Angeles', new Date()) // current offset in LA/SF
-```
+// Returns 420 or 480, depending on whether we're on daylight savings
 
-support all the world's timezones, including DST and historical changes, in under 1KB of javascript!
-
-
-### print dates
-
-```js
 const o1 = {hour: 'numeric', minute: '2-digit', timeZoneName: 'short'}
 tzjs.fmt(o1).format(d1)
 // example: "4:00 PM PST". localizes to the user's timezone and language
 
 const o2 = {hour: 'numeric', minute: '2-digit', timeZone: 'UTC'}
-tzjs.fmt(o2).format(d1, 'en-US')
+tzjs.fmt(o2, 'en-US').format(d1)
 // always returns "12:00 AM", regardless of browser settings
+
+const o3 = {month: 'long', day: 'numeric', timeZone: 'UTC'}
+tzjs.fmt(o3, 'es').format(d1)
+// always returns "1 de enero"
 ```
 
+support all the world's timezones, including DST and historical changes, in under 1KB of javascript!
+
+`getOffset` is a few lines of very tricky code, working around a limitation in `window.Intl`.
+
 `fmt` is a thin wrapper around `Intl.DateTimeFormat`. it's shorter to type and memoized, which we've measured to be important for performance.
+
 
 
 ## comparison
 
 the two most popular libraries for dealing with dates in the browser are `moment` and `date-fns`.
 
-if you need to format times in a specific timezone--any timezone other than browser local or UTC--the situation was grim. until now!
+if you needed to format times in a specific timezone--any timezone other than browser local or UTC--the situation was grim. until now!
 
 | formatting library | min. size | timezone support lib | min. size |
 |:-|:-|:-|:-|
@@ -57,6 +60,7 @@ if you need to format times in a specific timezone--any timezone other than brow
 **you can use `tzjs` by itself or together with `date-fns`**
 
 
+
 ## api reference
 
 
@@ -64,14 +68,13 @@ if you need to format times in a specific timezone--any timezone other than brow
 
 
 ```js
-const { getOffset, fmt, toDate } = require('tzjs')
+import { getOffset, fmt, toDate } from 'tzjs'
 ```
 
-or, with ES6,
-
+or, with ES5,
 
 ```js
-import { getOffset, fmt, toDate } from 'tzjs'
+const tzjs = require('tzjs')
 ```
 
 ### `getOffset(timeZone, date)`
@@ -87,8 +90,8 @@ this behavior matches [Date.getTimezoneOffset](https://developer.mozilla.org/en-
 **example:**
 
 ```js
-getOffset('America/Los_Angeles', '2020-01-01T00:00:00Z')
-// returns 480
+getOffset('America/Los_Angeles', '2020-04-20')
+// returns 420
 ```
 
 
@@ -193,6 +196,7 @@ momentTz.utcOffset: 366792 offsets in 386ms
 that works out to 16us per offset for `tzjs` vs 1us for `moment-timezone`
 
 `tzjs` saves you ~400KB from your minified bundle size, which can cut page load time significantly.
+
 
 
 ## date formatting
