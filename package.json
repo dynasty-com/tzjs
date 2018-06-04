@@ -1,6 +1,6 @@
 {
   "name": "tzjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "timezones without the bloat",
   "main": "index.js",
   "scripts": {
