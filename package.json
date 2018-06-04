@@ -1,0 +1,40 @@
+{
+  "name": "tzjs",
+  "version": "1.0.0",
+  "description": "timezones without the bloat",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && node --icu-data-dir=node_modules/full-icu ./test.js",
+    "test-browser": "echo Ensure SAUCE_[USERNAME,ACCESS_KEY] are set && airtap -- ./test.js",
+    "print-locales": "node --icu-data-dir=node_modules/full-icu ./print-locales.js",
+    "bench": "node --icu-data-dir=node_modules/full-icu ./bench.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dynasty-com/tzjs.git"
+  },
+  "keywords": [
+    "timezone",
+    "offset",
+    "date",
+    "time",
+    "formatting",
+    "intl",
+    "internationalization",
+    "moment",
+    "date-fns"
+  ],
+  "author": "",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/dynasty-com/tzjs/issues"
+  },
+  "homepage": "https://github.com/dynasty-com/tzjs#readme",
+  "devDependencies": {
+    "airtap": "0.0.7",
+    "full-icu": "^1.2.1",
+    "moment-timezone": "^0.5.17",
+    "standard": "^11.0.1",
+    "tape": "^4.9.0"
+  }
+}
