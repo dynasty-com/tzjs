@@ -1,11 +1,16 @@
 # tzjs
 [![CircleCI](https://circleci.com/gh/dynasty-com/tzjs.svg?style=svg)](https://circleci.com/gh/dynasty-com/tzjs)
+<!-- [![saucelabs](https://saucelabs.com/browser-matrix/tzjs.svg)](https://saucelabs.com/u/tzjs) -->
 
 timezones without bloat
 
 **use moment-timezone? save 400KB, minified!**
 
 ## quick start
+
+```
+npm i tzjs
+```
 
 ### get timezone offsets
 
@@ -36,7 +41,7 @@ tzjs.fmt({hour: 'numeric', minute: '2-digit', timeZone: 'UTC'}).format(d1, 'en-U
 `fmt` is a thin wrapper around `Intl.DateTimeFormat`. it's shorter to type and memoized, which we've measured to be important for performance.
 
 
-## quick comparison
+## comparison
 
 the two most popular libraries for dealing with dates in the browser are `moment` and `date-fns`.
 
@@ -49,6 +54,83 @@ if you need to format times in a specific timezone--any timezone other than brow
 | **window.Intl.DateTimeFormat** | **0KB** | **tzjs** | **1KB** |
 
 **you can use `tzjs` by itself or together with `date-fns`**
+
+
+## api reference
+
+
+`tzjs` exports just three functions.
+
+
+```js
+const { getOffset, fmt, toDate } = require('tzjs')
+```
+
+or, with ES6,
+
+
+```js
+import { getOffset, fmt, toDate } from 'tzjs'
+```
+
+### `getOffset(timeZone, date)`
+
+returns offset from UTC in minutes
+
+note that if a timzone's at UTC+1, getOffset() returns -60, not 60
+
+in other words, it returns the number of minutes you'd have to add to get to UTC
+
+this behavior matches [Date.getTimezoneOffset](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset)
+
+**example:**
+
+```js
+getOffset('America/Los_Angeles', '2020-01-01T00:00:00Z')
+// returns 480
+```
+
+
+### `fmt(options, locale)`
+
+returns `Intl.DateTimeFormat(locale, options)`
+
+fmtizes the result. this is important, since the `DateTimeFormat` constructor is slow.
+
+`locale` is optional and defaults to the browser locale.
+
+**example:**
+
+```js
+const opts = {year: 'numeric', month: 'short', day: '2-digit', hour: 'numeric', minute: 'numeric'}
+const optsWithTz = Object.assign({timeZone: 'America/New_York'}, opts)
+
+fmt(optsWithTz, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
+// always returns "Dec 31, 2019, 7:00 PM"
+
+fmt(opts, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
+// returns "Dec 31, 2019, 4:00 PM" here in California
+// return value depends on browser timezone
+
+fmt(optsTz, 'es').format(new Date('2020-01-01T00:00:00Z'))
+// always returns "31 dic. 2019 19:00"
+
+fmt(opts).format(new Date('2020-01-01T00:00:00Z'))
+// might produce any of the values above!
+// return value depends on browser timezone and language setting
+```
+
+
+### `toDate`
+
+helper function. takes a `Date` object, Unix millis, an ISO timestamp like `"2020-01-01T00:00:00Z"`. returns a `Date`.
+
+**example:**
+
+```js
+fmt({hour: 'numeric', minute: 'numeric', timeZoneName: 'short'}).format(toDate('2020-01-01'))
+// returns "4:00 PM PST", correctly localized to the user's timezone and language setting
+```
 
 
 ## faq
@@ -159,80 +241,4 @@ import { dateTimeTz } from '../date.js'
 function MessageLabel (date: Date) {
   return <span>Sent {dateTimeTz(date, 'America/Los_Angeles')}</span>
 }
-```
-
-## api reference
-
-
-`tzjs` exports just three functions.
-
-
-```js
-const { getOffset, fmt, toDate } = require('tzjs')
-```
-
-or, with ES6,
-
-
-```js
-import { getOffset, fmt, toDate } from 'tzjs'
-```
-
-### `getOffset(timeZone, date)`
-
-returns offset from UTC in minutes
-
-note that if a timzone's at UTC+1, getOffset() returns -60, not 60
-
-in other words, it returns the number of minutes you'd have to add to get to UTC
-
-this behavior matches [Date.getTimezoneOffset](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset)
-
-**example:**
-
-```js
-getOffset('America/Los_Angeles', '2020-01-01T00:00:00Z')
-// returns 480
-```
-
-
-### `fmt(options, locale)`
-
-returns `Intl.DateTimeFormat(locale, options)`
-
-fmtizes the result. this is important, since the `DateTimeFormat` constructor is slow.
-
-`locale` is optional and defaults to the browser locale.
-
-**example:**
-
-```js
-const opts = {year: 'numeric', month: 'short', day: '2-digit', hour: 'numeric', minute: 'numeric'}
-const optsWithTz = Object.assign({timeZone: 'America/New_York'}, opts)
-
-fmt(optsWithTz, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
-// always returns "Dec 31, 2019, 7:00 PM"
-
-fmt(opts, 'en-US').format(new Date('2020-01-01T00:00:00Z'))
-// returns "Dec 31, 2019, 4:00 PM" here in California
-// return value depends on browser timezone
-
-fmt(optsTz, 'es').format(new Date('2020-01-01T00:00:00Z'))
-// always returns "31 dic. 2019 19:00"
-
-fmt(opts).format(new Date('2020-01-01T00:00:00Z'))
-// might produce any of the values above!
-// return value depends on browser timezone and language setting
-```
-
-
-### `toDate`
-
-helper function. takes a `Date` object, Unix millis, an ISO timestamp like `"2020-01-01T00:00:00Z"`. returns a `Date`.
-
-**example:**
-
-```js
-fmt({hour: 'numeric', minute: 'numeric', timeZoneName: 'short'}).format(toDate('2020-01-01'))
-// returns "4:00 PM PST", correctly localized to the user's timezone and language setting
 ```

@@ -1,5 +1,9 @@
 const test = require('tape')
-const { getOffset, fmt, toDate } = require('.')
+const tzjs = require('.')
+
+const getOffset = tzjs.getOffset
+const fmt = tzjs.fmt
+const toDate = tzjs.toDate
 
 test('toDate', function (t) {
   const d = new Date('2020-01-01T00:00:00Z')
@@ -25,7 +29,7 @@ test('fmt', function (t) {
 })
 
 // With thanks to https://github.com/mobz/get-timezone-offset !
-var tzinfo = [
+const tzinfo = [
   ['UTC', 1483272000000, 0],
 
   ['Pacific/Midway', 1483272000000, 660],

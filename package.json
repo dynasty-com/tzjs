@@ -4,7 +4,7 @@
   "description": "timezones without the bloat",
   "main": "index.js",
   "scripts": {
-    "test": "standard && node --icu-data-dir=node_modules/full-icu ./test.js",
+    "test": "standard && node --version && node --icu-data-dir=node_modules/full-icu ./test.js",
     "test-browser": "echo Ensure SAUCE_[USERNAME,ACCESS_KEY] are set && airtap -- ./test.js",
     "print-locales": "node --icu-data-dir=node_modules/full-icu ./print-locales.js",
     "bench": "node --icu-data-dir=node_modules/full-icu ./bench.js"
