@@ -23,9 +23,9 @@ test('README examples', function (t) {
   const d2 = new Date('2020-06-01') // June 1, now we're in daylight savings time
   t.equal(getOffset('Europe/Berlin', d2), -120)
 
-  t.equal(fmt({hour: 'numeric', minute: '2-digit', timeZone: 'UTC'}, 'en-US').format(d1), '12:00 AM')
+  t.equal(fmt({ hour: 'numeric', minute: '2-digit', timeZone: 'UTC' }, 'en-US').format(d1), '12:00 AM')
 
-  t.equal(fmt({month: 'long', day: 'numeric', timeZone: 'UTC'}, 'es').format(d1), '1 de enero')
+  t.equal(fmt({ month: 'long', day: 'numeric', timeZone: 'UTC' }, 'es').format(d1), '1 de enero')
 
   t.equal(getOffset('America/Los_Angeles', '2020-04-20'), 420) // Blaze it
 
