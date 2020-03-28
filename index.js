@@ -28,8 +28,7 @@ function getOffset (timeZone, date) {
 // Returns eg "2020-01-01T00:00:00Z", but NOT actually in UTC.
 // Instead, the returned time is local to the specified timezone.
 function getPseudoISO (date, timeZone) {
-  // Africaans "af-ZA" with 2-digit everything roughly returns ISO
-  const str = fmt({
+  const formattedParts = fmt({
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -38,11 +37,32 @@ function getPseudoISO (date, timeZone) {
     second: '2-digit',
     hour12: false,
     timeZone
-  }, 'af-ZA', timeZone).format(date)
-  if (str.length !== 19 || str[10] !== ' ') {
-    throw new Error('Pseudo-ISO failed, got: ' + str)
+  }, 'en-US', timeZone).formatToParts(date)
+  let year, month, day, hour, minute, second
+  for (let part of formattedParts) {
+    switch (part.type) {
+      case 'year':
+        year = part.value
+        break
+      case 'month':
+        month = part.value
+        break
+      case 'day':
+        day = part.value
+        break
+      case 'hour':
+        hour = part.value
+        break
+      case 'minute':
+        minute = part.value
+        break
+      case 'second':
+        second = part.value
+        break
+    }
   }
-  return str.replace(' ', 'T') + 'Z'
+  const utcDate = `${year}-${month}-${day}T${hour}:${minute}:${second}Z`
+  return utcDate
 }
 
 // Memoizes an Intl.DateTimeFormat.
