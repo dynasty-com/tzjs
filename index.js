@@ -38,9 +38,31 @@ function getPseudoISO (date, timeZone) {
     hour12: false,
     timeZone
   }, 'en-US', timeZone).formatToParts(date)
-  const find = (key) => formattedParts.find(part => part.type === key).value
-  const utcDate = `${find('year')}-${find('month')}-${find('day')}T${find('hour')}:${find('minute')}:${find('second')}Z`
-  return new Date(utcDate)
+  let year, month, day, hour, minute, second
+  for (let part of formattedParts) {
+    switch (part.type) {
+      case 'year':
+        year = part.value
+        break
+      case 'month':
+        month = part.value
+        break
+      case 'day':
+        day = part.value
+        break
+      case 'hour':
+        hour = part.value
+        break
+      case 'minute':
+        minute = part.value
+        break
+      case 'second':
+        second = part.value
+        break
+    }
+  }
+  const utcDate = `${year}-${month}-${day}T${hour}:${minute}:${second}Z`
+  return utcDate
 }
 
 // Memoizes an Intl.DateTimeFormat.
