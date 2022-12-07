@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/dynasty-com/tzjs#readme",
   "devDependencies": {
-    "airtap": "^0.1.0",
+    "airtap": "^4.0.4",
     "ajv": "^6.5.5",
     "full-icu": "^1.2.1",
     "moment-timezone": "^0.5.23",
