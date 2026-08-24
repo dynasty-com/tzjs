@@ -212,13 +212,13 @@ const locales = ['af-ZA',
 locales.forEach(f => {
   const d = new Intl.DateTimeFormat(f, {
     year: 'numeric',
-    'month': '2-digit',
-    'day': '2-digit',
-    'hour': '2-digit',
-    'minute': '2-digit',
-    'second': '2-digit',
-    'hour12': false,
-    'timeZone': 'UTC'
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'UTC'
   }).format(9e8)
   console.log('%s %s', f, d)
 })
